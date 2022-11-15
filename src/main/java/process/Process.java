@@ -24,4 +24,5 @@ public class Process {
         var cpuTime = process.info().totalCpuDuration();
         this.cpuTime = cpuTime.map(Duration::getSeconds).orElse(0L);
     }
+
 }

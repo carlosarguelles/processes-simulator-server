@@ -4,7 +4,6 @@ import process.Process;
 
 public class Simulator  {
     private final Process[] processList;
-    private
 
     public Simulator(Process[] processList) {
         this.processList = processList;
@@ -12,7 +11,7 @@ public class Simulator  {
 
     public void run() {
         while (true) {
-            for ()
+            
         }
     }
 }

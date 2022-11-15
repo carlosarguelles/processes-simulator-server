@@ -11,7 +11,10 @@ public class ProcessService {
         var ps = ProcessHandle.allProcesses();
         var processes = new ArrayList<Process>();
         for (ProcessHandle p : ps.toList()) {
-            processes.add(new Process(p));
+            Process newProcess = new Process(p);
+            if (!newProcess.getName().equals("")) {
+                processes.add(new Process(p));
+            }
         }
         return limit != null ? processes.subList(0, limit): processes;
     }
