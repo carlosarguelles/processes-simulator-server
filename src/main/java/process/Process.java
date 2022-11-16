@@ -6,12 +6,12 @@ import java.time.Duration;
 
 @Data
 public class Process {
-    private final long pid;
-    private final String user;
-    private final String name;
-    private final String fullName;
-    private final boolean priority;
-    private final long cpuTime;
+    private long pid;
+    private String user;
+    private String name;
+    private String fullName;
+    private boolean priority;
+    private long cpuTime;
 
     public Process(ProcessHandle process) {
         this.pid = process.pid();
