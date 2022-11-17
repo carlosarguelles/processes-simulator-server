@@ -12,6 +12,9 @@ public class Process {
     private String fullName;
     private boolean priority;
     private long cpuTime;
+    private int arrivalTime;
+    private int burstTime;
+    private ProcessState state;
 
     public Process(ProcessHandle process) {
         this.pid = process.pid();
@@ -24,4 +27,7 @@ public class Process {
         var cpuTime = process.info().totalCpuDuration();
         this.cpuTime = cpuTime.map(Duration::getSeconds).orElse(0L);
     }
+
+    public void execute() { }
+
 }
