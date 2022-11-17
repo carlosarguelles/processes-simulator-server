@@ -2,6 +2,7 @@ package so;
 
 import io.javalin.Javalin;
 import process.ProcessController;
+import simulator.SimulatorController;
 
 import static io.javalin.apibuilder.ApiBuilder.*;
 
@@ -17,6 +18,7 @@ public class App {
             path("process", () -> {
                 get("all", ProcessController::all);
             });
+            get("simulation", SimulatorController::simulate);
         });
     }
 }
