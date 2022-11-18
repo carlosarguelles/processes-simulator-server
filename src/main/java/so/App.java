@@ -18,7 +18,9 @@ public class App {
             path("process", () -> {
                 get("all", ProcessController::all);
             });
-            get("simulation", SimulatorController::simulate);
+            path("simulation", () -> {
+                post("run", SimulatorController::simulate);
+            });
         });
     }
 }
