@@ -2,8 +2,10 @@ package process;
 
 import lombok.Data;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.Duration;
-import java.util.ArrayList;
 
 @Data
 public class Process {
@@ -13,18 +15,12 @@ public class Process {
     private String fullName;
     private boolean priority;
     private long cpuTime;
-    private int arrivalTime;
-    private int burstTime;
-    private int currentBurstTime;
-    private int finalTime;
-    private int startTime;
-    private int executionTime;
+    private long arrivalTime;
+    private long burstTime;
     private ProcessState state;
     private Integer turnAround;
-
-    //ArrayList to save the times quantum of time assigned to the process.
-    private ArrayList<Iteration> iterations;
-
+    private long executions;
+    private long finalTime;
 
     public Process(ProcessHandle process) {
         this.pid = process.pid();
@@ -36,54 +32,32 @@ public class Process {
         this.priority = process.info().user().orElse("").equals("root");
         var cpuTime = process.info().totalCpuDuration();
         this.cpuTime = cpuTime.map(Duration::getSeconds).orElse(0L);
+        this.executions = 0;
         this.state = ProcessState.READY;
-        this.iterations = new ArrayList<>();
     }
 
-    public void execute() {
-    }
-
-    public void addIteration(Iteration iteration) {
-        iterations.add(iteration);
-        this.finalTime = this.getFinalTime();
-    }
-
-    @Override
-    public String toString() {
-        String message = "PID: " + this.pid
-                + "\nName: " + this.name
-                + "\nUser: " + this.user
-                + "\nPriority: " + this.priority
-                + "\nCPU time: " + this.cpuTime
-                + "\nEnd Time: " + getFinalTime()
-                + "\n________________________________________\n";
-
-        int timeCounter = 1;
-        for (Iteration i : this.iterations) {
-            message += "\n\t ITERATIONS:";
-            message += "\n\t: Iteration " + timeCounter + "\n\t\tStart: " + i.getStart()
-                    + "\n\t\tEnd: " + i.getEnd();
+    public void execute(long quantum) throws IOException, InterruptedException {
+        var path = Util.createFilePath("temp", this.pid + this.name);
+        var f = new File(path);
+        var writer = new FileWriter(f.toPath().toString());
+        if (this.priority) {
+            writer.write(this.name);
+            Thread.sleep(this.burstTime);
+            this.finalTime = this.burstTime;
+            this.burstTime = 0;
+            this.executions = 1;
+            this.setState(ProcessState.DONE);
+        } else if (this.burstTime > quantum) {
+            writer.write(this.name.substring(0, (int) quantum));
+            this.burstTime = this.burstTime - quantum;
+            this.executions++;
+            this.finalTime = this.executions * quantum;
+            Thread.sleep(quantum);
+            this.setState(ProcessState.RUNNING);
+        } else {
+            this.burstTime = 0;
+            this.setState(ProcessState.DONE);
         }
-        return message;
-    }
-
-    public int getStartTime() {
-        return (this.iterations.size() > 0) ? this.iterations.get(0).getStart() : 0;
-    }
-
-    public int getFinalTime() {
-        return (this.iterations.size() > 0) ? this.iterations.get(iterations.size() - 1).getEnd() : 0;
-    }
-
-    public void setState() {
-        if (this.currentBurstTime == 0) {
-            this.state = ProcessState.DONE;
-        } else if (this.getIterations().size() > 0) {
-            this.state = ProcessState.RUNNING;
-        }
-    }
-
-    public Integer getTurnAround() {
-        return this.getFinalTime() - this.getStartTime();
+        writer.close();
     }
 }

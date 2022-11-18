@@ -26,5 +26,8 @@ public class App {
                 post("run", SimulatorController::simulate);
             });
         });
+        app.ws("runAsync", ws -> {
+            ws.onConnect(SimulatorController::simulateAsync);
+        });
     }
 }
