@@ -37,6 +37,18 @@ public class Process {
         this.state = ProcessState.READY;
     }
 
+    public String toStringFile() {
+        String message = this.pid + ";"
+        + this.fullName + ";"
+        + this.name + ";"
+        + this.user + ";"
+        + this.priority + ";"
+        + this.cpuTime + ";"
+        + this.executions + ";"
+        + this.state;
+
+        return message;
+    }
     public void execute(long quantum) throws IOException, InterruptedException {
         var path = Util.createFilePath("temp", this.pid + this.name);
         var f = new File(path);
@@ -63,4 +75,6 @@ public class Process {
         }
         writer.close();
     }
+
+
 }
