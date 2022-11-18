@@ -15,10 +15,15 @@ public class Process {
     private long cpuTime;
     private int arrivalTime;
     private int burstTime;
+    private int currentBurstTime;
+    private int finalTime;
+    private int startTime;
+    private int executionTime;
     private ProcessState state;
+    private Integer turnAround;
 
     //ArrayList to save the times quantum of time assigned to the process.
-    private ArrayList<Iteration> cpuTimes;
+    private ArrayList<Iteration> iterations;
 
 
     public Process(ProcessHandle process) {
@@ -31,37 +36,54 @@ public class Process {
         this.priority = process.info().user().orElse("").equals("root");
         var cpuTime = process.info().totalCpuDuration();
         this.cpuTime = cpuTime.map(Duration::getSeconds).orElse(0L);
-
-        this.cpuTimes = new ArrayList<>();
-        
+        this.state = ProcessState.READY;
+        this.iterations = new ArrayList<>();
     }
 
-    public void execute() { }
+    public void execute() {
+    }
 
     public void addIteration(Iteration iteration) {
-        cpuTimes.add(iteration);
+        iterations.add(iteration);
+        this.finalTime = this.getFinalTime();
     }
 
     @Override
     public String toString() {
         String message = "PID: " + this.pid
-        + "\nName: " + this.name
-        + "\nUser: " + this.user
-        + "\nPriority: " + this.priority
-        + "\nCPU time: " + this.cpuTime
-        + "\nEnd Time: " + getFinalTime()
-        + "\n________________________________________\n";
+                + "\nName: " + this.name
+                + "\nUser: " + this.user
+                + "\nPriority: " + this.priority
+                + "\nCPU time: " + this.cpuTime
+                + "\nEnd Time: " + getFinalTime()
+                + "\n________________________________________\n";
 
         int timeCounter = 1;
-        for (Iteration i : this.cpuTimes) {
+        for (Iteration i : this.iterations) {
             message += "\n\t ITERATIONS:";
             message += "\n\t: Iteration " + timeCounter + "\n\t\tStart: " + i.getStart()
-            + "\n\t\tEnd: " + i.getEnd();
+                    + "\n\t\tEnd: " + i.getEnd();
         }
         return message;
     }
 
-    public Integer getFinalTime() {
-        return (this.cpuTimes.size() > 0)? this.cpuTimes.get(cpuTimes.size() - 1).getEnd() : 0;
+    public int getStartTime() {
+        return (this.iterations.size() > 0) ? this.iterations.get(0).getStart() : 0;
+    }
+
+    public int getFinalTime() {
+        return (this.iterations.size() > 0) ? this.iterations.get(iterations.size() - 1).getEnd() : 0;
+    }
+
+    public void setState() {
+        if (this.currentBurstTime == 0) {
+            this.state = ProcessState.DONE;
+        } else if (this.getIterations().size() > 0) {
+            this.state = ProcessState.RUNNING;
+        }
+    }
+
+    public Integer getTurnAround() {
+        return this.getFinalTime() - this.getStartTime();
     }
 }
