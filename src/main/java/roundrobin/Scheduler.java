@@ -1,6 +1,6 @@
 package roundrobin;
 
-import io.javalin.websocket.WsConnectContext;
+import io.javalin.websocket.WsMessageContext;
 import process.Process;
 import process.ProcessState;
 
@@ -12,12 +12,12 @@ public class Scheduler extends Thread {
     private final long quantum;
     private final List<Process> queue;
     private final List<Process> done;
-    private final WsConnectContext ctx;
+    private final WsMessageContext ctx;
 
     private record SimulationResponse(List<Process> queue, List<Process> done) {
     }
 
-    public Scheduler(long quantum, List<Process> processes, WsConnectContext ctx) {
+    public Scheduler(long quantum, List<Process> processes, WsMessageContext ctx) {
         this.quantum = quantum;
         this.queue = processes;
         this.done = new ArrayList<>();

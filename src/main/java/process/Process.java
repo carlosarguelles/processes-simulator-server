@@ -17,6 +17,7 @@ public class Process {
     private long cpuTime;
     private long arrivalTime;
     private long burstTime;
+    private long initialBurstTime;
     private ProcessState state;
     private Integer turnAround;
     private long executions;
@@ -48,7 +49,9 @@ public class Process {
             this.executions = 1;
             this.setState(ProcessState.DONE);
         } else if (this.burstTime > quantum) {
-            writer.write(this.name.substring(0, (int) quantum));
+            var s = this.name.substring(0, (int) quantum / 1000);
+            System.out.println(s);
+            writer.write(s);
             this.burstTime = this.burstTime - quantum;
             this.executions++;
             this.finalTime = this.executions * quantum;

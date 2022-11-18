@@ -3,7 +3,7 @@ package so;
 import io.javalin.Javalin;
 import io.javalin.plugin.bundled.CorsPluginConfig;
 import process.ProcessController;
-import simulator.SimulatorController;
+import roundrobin.SchedulerController;
 
 import static io.javalin.apibuilder.ApiBuilder.*;
 
@@ -22,12 +22,7 @@ public class App {
             path("process", () -> {
                 get("all", ProcessController::all);
             });
-            path("simulation", () -> {
-                post("run", SimulatorController::simulate);
-            });
         });
-        app.ws("runAsync", ws -> {
-            ws.onConnect(SimulatorController::simulateAsync);
-        });
+        app.ws("runAsync", SchedulerController::bootstrap);
     }
 }
