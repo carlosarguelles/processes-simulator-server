@@ -3,12 +3,14 @@ package so;
 import io.javalin.Javalin;
 import io.javalin.plugin.bundled.CorsPluginConfig;
 import process.ProcessController;
+import process.Util;
 import roundrobin.SchedulerController;
 
 import static io.javalin.apibuilder.ApiBuilder.*;
 
 public class App {
     public static void main(String[] args) {
+        Util.removeFilesFromTempFolder();
         var app = Javalin.create(config -> {
             config.jsonMapper(JSON.getJsonMapper());
             config.plugins.enableCors(cors -> cors.add(CorsPluginConfig::anyHost));

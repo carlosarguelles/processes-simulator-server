@@ -19,7 +19,7 @@ public class Process {
     private long burstTime;
     private long initialBurstTime;
     private ProcessState state;
-    private Integer turnAround;
+    private long turnAround;
     private long executions;
     private long finalTime;
 
@@ -49,8 +49,9 @@ public class Process {
 
         return message;
     }
+
     public void execute(long quantum) throws IOException, InterruptedException {
-        var path = Util.createFilePath("temp", this.pid + this.name);
+        var path = Util.createFilePath("temp", this.name + " (" + this.pid + ")");
         var f = new File(path);
         var writer = new FileWriter(f.toPath().toString());
         if (this.priority) {
@@ -61,7 +62,8 @@ public class Process {
             this.executions = 1;
             this.setState(ProcessState.DONE);
         } else if (this.burstTime > quantum) {
-            var s = this.name.substring(0, (int) quantum / 1000);
+            var charactersToWrite = Util.millisToSeconds(this.initialBurstTime - this.burstTime);
+            var s = this.name.substring(0, Math.min(charactersToWrite, this.name.length()));
             System.out.println(s);
             writer.write(s);
             this.burstTime = this.burstTime - quantum;
@@ -71,10 +73,14 @@ public class Process {
             this.setState(ProcessState.RUNNING);
         } else {
             this.burstTime = 0;
+            writer.write(this.name);
             this.setState(ProcessState.DONE);
         }
+        setTurnAround();
         writer.close();
     }
 
-
+    public void setTurnAround() {
+        this.turnAround = this.finalTime - this.arrivalTime;
+    }
 }

@@ -3,6 +3,7 @@ package roundrobin;
 import io.javalin.websocket.WsMessageContext;
 import process.Process;
 import process.ProcessState;
+import process.Util;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,21 +35,21 @@ public class Scheduler extends Thread {
     }
 
     public void simulate() throws IOException, InterruptedException {
+        Util.removeFilesFromTempFolder();
         while (!queue.isEmpty()) {
-            for (int i = 0; i < queue.size(); i++) {
-                queue.get(i).execute(quantum);
+            queue.get(0).execute(quantum);
 
-                if (queue.get(i).getState().equals(ProcessState.DONE)) {
-                    done.add(queue.get(i));
-                }
-
-                if (queue.get(i).getState().equals(ProcessState.RUNNING)) {
-                    queue.add(queue.get(i));
-                }
-
-                queue.remove(0);
-                ctx.send(new SimulationResponse(queue, done));
+            if (queue.get(0).getState().equals(ProcessState.DONE)) {
+                done.add(queue.get(0));
             }
+
+            if (queue.get(0).getState().equals(ProcessState.RUNNING)) {
+                queue.add(queue.get(0));
+            }
+
+            queue.remove(0);
+
+            ctx.send(new SimulationResponse(queue, done));
         }
     }
 }
